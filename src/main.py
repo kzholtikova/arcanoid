@@ -1,14 +1,13 @@
 import pygame
-import sys
 
 WIDTH, HEIGHT = 800, 600
 FPS = 60
 WHITE = (255, 255, 255)
 
 TITLE = "Arkanoid"
-pygame.display.set_caption(TITLE)
 
 Background = pygame.image.load("images\\1 (1).jpg")
+
 
 class Paddle(pygame.sprite.Sprite):
     def __init__(self):
@@ -19,6 +18,7 @@ class Paddle(pygame.sprite.Sprite):
     def update(self):
         self.rect.centerx = pygame.mouse.get_pos()[0]
         self.rect.clamp_ip(screen.get_rect())
+
 
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
@@ -37,18 +37,20 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
 
+
+pygame.display.set_caption(TITLE)
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 paddle = Paddle()
 ball = Ball()
+playing = True
 
-while True:
+while playing:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+            playing = False
 
     paddle.update()
     ball.update()
