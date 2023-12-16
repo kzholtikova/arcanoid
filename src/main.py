@@ -44,3 +44,18 @@ clock = pygame.time.Clock()
 paddle = Paddle()
 ball = Ball()
 
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    paddle.update()
+    ball.update()
+
+    screen.blit(Background, (0, 0))
+    screen.blit(paddle.image, paddle.rect)
+    screen.blit(ball.image, ball.rect)
+    pygame.display.flip()
+
+    clock.tick(FPS)
