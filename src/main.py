@@ -89,6 +89,16 @@ while playing:
 
     screen.blit(paddle.image, paddle.rect)
     screen.blit(ball.image, ball.rect)
+
+    if not obstacles:
+        font = pygame.font.Font(None, 100)
+        text = font.render("YOU WON!", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        pygame.time.delay(4000)
+        playing = False
+
     pygame.display.flip()
 
     clock.tick(FPS)
