@@ -10,7 +10,7 @@ TITLE = "Arkanoid"
 class Paddle(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("images\\platform.png")
+        self.image = pygame.image.load("platform.png")
         self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 30))
 
     def update(self):
@@ -22,7 +22,7 @@ class Ball(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.radius = 10
-        self.image = pygame.image.load("images\\ball.png")
+        self.image = pygame.image.load("ball.png")
         self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         self.speed = pygame.Vector2(5, 5)
 
@@ -35,16 +35,42 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
 
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("obstacle.png")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect(center=(x, y))
 
 pygame.init()
 pygame.display.set_caption(TITLE)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-background = pygame.image.load("images\\background.jpg")
+background = pygame.image.load("background.jpg")
 clock = pygame.time.Clock()
 
 paddle = Paddle()
 ball = Ball()
+obstacles = pygame.sprite.Group()
 playing = True
+
+obstacle_width = 60
+obstacle_height = 60
+
+
+obstacles_row = 10
+obstacles_amount = obstacles_row * 2
+
+
+horizontal_spacing = WIDTH // (obstacles_row + 1)
+vertical_spacing = 60
+
+for row in range(2):
+    for col in range(obstacles_row):
+        x = (col + 1) * horizontal_spacing
+        y = (row + 1) * vertical_spacing
+        obstacle = Obstacle(x, y, obstacle_width, obstacle_height)
+        obstacles.add(obstacle)
+
 
 while playing:
     for event in pygame.event.get():
@@ -54,7 +80,13 @@ while playing:
     paddle.update()
     ball.update()
 
+    hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
+
     screen.blit(background, (0, 0))
+
+    for obstacle in obstacles:
+        screen.blit(obstacle.image, obstacle.rect)
+
     screen.blit(paddle.image, paddle.rect)
     screen.blit(ball.image, ball.rect)
     pygame.display.flip()
