@@ -6,8 +6,6 @@ WHITE = (255, 255, 255)
 
 TITLE = "Arkanoid"
 
-Background = pygame.image.load("images\\1 (1).jpg")
-
 
 class Paddle(pygame.sprite.Sprite):
     def __init__(self):
@@ -38,9 +36,10 @@ class Ball(pygame.sprite.Sprite):
             self.speed.y *= -1
 
 
-pygame.display.set_caption(TITLE)
 pygame.init()
+pygame.display.set_caption(TITLE)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+background = pygame.image.load("images\\background.jpg")
 clock = pygame.time.Clock()
 
 paddle = Paddle()
@@ -55,7 +54,7 @@ while playing:
     paddle.update()
     ball.update()
 
-    screen.blit(Background, (0, 0))
+    screen.blit(background, (0, 0))
     screen.blit(paddle.image, paddle.rect)
     screen.blit(ball.image, ball.rect)
     pygame.display.flip()
