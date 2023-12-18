@@ -35,6 +35,19 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
 
+
+class Heart(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.whole_heart = pygame.image.load("whole_heart.png")
+        self.broken_heart = pygame.image.load("broken_heart.png")
+        self.image = self.whole_heart
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def set_broken_heart(self):
+        self.image = self.broken_heart
+        
+
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
