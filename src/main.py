@@ -1,22 +1,104 @@
-first_player = 'X'
-second_player = 'O'
+import pygame
 
-game_field = [
-    [" ", " ", " "],
-    [" ", " ", " "],
-    [" ", " ", " "]
-]
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+WHITE = (255, 255, 255)
 
-# first player is first to make a move
-current_player = first_player
+TITLE = "Arkanoid"
 
-row, column = input_move()
-game_field[row][column] = current_player
-print_field()
-winner = check_winner()
 
-if winner is not None:
-    congratulate_player(winner)
-    quit()
+class Paddle(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("platform.png")
+        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 30))
 
-current_player = first_player if current_player == second_player else second_player
+    def update(self):
+        self.rect.centerx = pygame.mouse.get_pos()[0]
+        self.rect.clamp_ip(screen.get_rect())
+
+
+class Ball(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.radius = 10
+        self.image = pygame.image.load("ball.png")
+        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        self.speed = pygame.Vector2(5, 5)
+
+    def update(self):
+        self.rect.move_ip(self.speed)
+        if self.rect.left < 0 or self.rect.right > WIDTH:
+            self.speed.x *= -1
+        if self.rect.top < 0 or self.rect.bottom > HEIGHT:
+            self.speed.y *= -1
+        if self.rect.colliderect(paddle):
+            self.speed.y *= -1
+
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.image.load("obstacle.png")
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect(center=(x, y))
+
+pygame.init()
+pygame.display.set_caption(TITLE)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+background = pygame.image.load("background.jpg")
+clock = pygame.time.Clock()
+
+paddle = Paddle()
+ball = Ball()
+obstacles = pygame.sprite.Group()
+playing = True
+
+obstacle_width = 60
+obstacle_height = 60
+
+
+obstacles_row = 10
+obstacles_amount = obstacles_row * 2
+
+
+horizontal_spacing = WIDTH // (obstacles_row + 1)
+vertical_spacing = 60
+
+for row in range(2):
+    for col in range(obstacles_row):
+        x = (col + 1) * horizontal_spacing
+        y = (row + 1) * vertical_spacing
+        obstacle = Obstacle(x, y, obstacle_width, obstacle_height)
+        obstacles.add(obstacle)
+
+
+while playing:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            playing = False
+
+    paddle.update()
+    ball.update()
+
+    hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
+
+    screen.blit(background, (0, 0))
+
+    for obstacle in obstacles:
+        screen.blit(obstacle.image, obstacle.rect)
+
+    screen.blit(paddle.image, paddle.rect)
+    screen.blit(ball.image, ball.rect)
+
+    if not obstacles:
+        font = pygame.font.Font(None, 100)
+        text = font.render("YOU WON!", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        pygame.time.delay(4000)
+        playing = False
+
+    pygame.display.flip()
+
+    clock.tick(FPS)
