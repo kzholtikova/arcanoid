@@ -3,8 +3,15 @@ import pygame
 WIDTH, HEIGHT = 800, 600
 FPS = 60
 WHITE = (255, 255, 255)
+TITLE = "Arcanoid"
 
-TITLE = "Arkanoid"
+OBSTACLES_ROW_NUMBER = 2
+OBSTACLES_IN_FIRST_ROW = 14
+SPACES_FROM_TOP = 1
+VERTICAL_OBSTACLES_SPACING = 60
+HORIZONTAL_OBSTACLES_SPACING = WIDTH / OBSTACLES_IN_FIRST_ROW
+calculate_margin = lambda obstacles_num: ((OBSTACLES_IN_FIRST_ROW - obstacles_num)
+                                          / 2) if obstacles_num != OBSTACLES_IN_FIRST_ROW else 0
 
 
 class Paddle(pygame.sprite.Sprite):
@@ -21,7 +28,6 @@ class Paddle(pygame.sprite.Sprite):
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.radius = 10
         self.image = pygame.image.load("ball.png")
         self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         self.speed = pygame.Vector2(5, 5)
@@ -35,12 +41,20 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
 
+
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("obstacle.png")
-        self.image = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.image.get_rect(center=(x, y))
+        self.image = pygame.transform.scale(pygame.image.load("obstacle.png"), (60, 60))
+        self.rect = pygame.Rect(x, y, 35, 35)
+
+    @staticmethod
+    def draw_row(obstacles_num, row, margin):
+        for col in range(obstacles_num):
+            x = (col + margin) * HORIZONTAL_OBSTACLES_SPACING
+            y = (row + SPACES_FROM_TOP) * VERTICAL_OBSTACLES_SPACING
+            obstacles.add(Obstacle(x, y))
+
 
 pygame.init()
 pygame.display.set_caption(TITLE)
@@ -53,23 +67,9 @@ ball = Ball()
 obstacles = pygame.sprite.Group()
 playing = True
 
-obstacle_width = 60
-obstacle_height = 60
-
-
-obstacles_row = 10
-obstacles_amount = obstacles_row * 2
-
-
-horizontal_spacing = WIDTH // (obstacles_row + 1)
-vertical_spacing = 60
-
-for row in range(2):
-    for col in range(obstacles_row):
-        x = (col + 1) * horizontal_spacing
-        y = (row + 1) * vertical_spacing
-        obstacle = Obstacle(x, y, obstacle_width, obstacle_height)
-        obstacles.add(obstacle)
+for row in range(OBSTACLES_ROW_NUMBER):
+    obstacles_per_row = OBSTACLES_IN_FIRST_ROW - row
+    Obstacle.draw_row(obstacles_per_row, row, calculate_margin(obstacles_per_row))
 
 
 while playing:
