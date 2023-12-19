@@ -30,10 +30,13 @@ class Ball(pygame.sprite.Sprite):
         self.rect.move_ip(self.speed)
         if self.rect.left < 0 or self.rect.right > WIDTH:
             self.speed.x *= -1
-        if self.rect.top < 0 or self.rect.bottom > HEIGHT:
+        if self.rect.top < 0:
             self.speed.y *= -1
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
+
+    def reset_position(self):
+        self.rect.center = (WIDTH // 2, HEIGHT // 2)
 
 
 class Heart(pygame.sprite.Sprite):
@@ -99,6 +102,11 @@ while playing:
 
     paddle.update()
     ball.update()
+
+    if ball.rect.bottom > HEIGHT:
+        list(hearts)[lives - 1].set_broken_heart()
+        lives -= 1
+        ball.reset_position() if lives > 0 else None
 
     hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
 
