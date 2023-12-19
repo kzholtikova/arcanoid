@@ -41,6 +41,11 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
 
+    def handle_collision(self):
+        normal_vector = pygame.Vector2(0, self.rect.centery - obstacle.rect.centery)
+        reflected_vector = pygame.Vector2.reflect(self.speed.normalize(), normal_vector.normalize())
+        self.speed = reflected_vector * abs(ball.speed.length())
+
 
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -80,7 +85,11 @@ while playing:
     paddle.update()
     ball.update()
 
-    hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
+    for obstacle in obstacles:
+        if ball.rect.colliderect(obstacle):
+            ball.handle_collision()
+            obstacles.remove(obstacle)
+            break
 
     screen.blit(background, (0, 0))
 
