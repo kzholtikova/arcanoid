@@ -4,7 +4,7 @@ WIDTH, HEIGHT = 800, 600
 FPS = 60
 WHITE = (255, 255, 255)
 
-TITLE = "Arkanoid"
+TITLE = "Arkanoidik"
 
 
 class Paddle(pygame.sprite.Sprite):
@@ -30,10 +30,13 @@ class Ball(pygame.sprite.Sprite):
         self.rect.move_ip(self.speed)
         if self.rect.left < 0 or self.rect.right > WIDTH:
             self.speed.x *= -1
-        if self.rect.top < 0 or self.rect.bottom > HEIGHT:
+        if self.rect.top < 0:
             self.speed.y *= -1
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
+
+    def reset_position(self):
+        self.rect.center = (WIDTH // 2, HEIGHT // 2)
 
 
 class Heart(pygame.sprite.Sprite):
@@ -60,6 +63,15 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, y))
 
 
+def end_game(message):
+    font = pygame.font.Font(None, 100)
+    text = font.render(message, True, (255, 255, 255))
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(text, text_rect)
+    pygame.display.flip()
+    pygame.time.delay(4000)
+
+
 pygame.init()
 pygame.display.set_caption(TITLE)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -69,8 +81,12 @@ clock = pygame.time.Clock()
 paddle = Paddle()
 ball = Ball()
 hearts = pygame.sprite.Group()
+lives = 3
 obstacles = pygame.sprite.Group()
 playing = True
+
+for col in range(lives):
+    Heart.draw(col)
 
 obstacle_width = 60
 obstacle_height = 60
@@ -84,7 +100,7 @@ vertical_spacing = 60
 for row in range(2):
     for col in range(obstacles_row):
         x = (col + 1) * horizontal_spacing
-        y = (row + 1) * vertical_spacing
+        y = (row + 2) * vertical_spacing
         obstacle = Obstacle(x, y, obstacle_width, obstacle_height)
         obstacles.add(obstacle)
 
@@ -96,9 +112,17 @@ while playing:
     paddle.update()
     ball.update()
 
+    if ball.rect.bottom > HEIGHT:
+        list(hearts)[lives - 1].set_broken_heart()
+        lives -= 1
+        ball.reset_position() if lives > 0 else None
+
     hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
 
     screen.blit(background, (0, 0))
+
+    for heart in hearts:
+        screen.blit(heart.image, heart.rect)
 
     for obstacle in obstacles:
         screen.blit(obstacle.image, obstacle.rect)
@@ -106,13 +130,12 @@ while playing:
     screen.blit(paddle.image, paddle.rect)
     screen.blit(ball.image, ball.rect)
 
+    if lives == 0:
+        end_game(message="GAME OVER!")
+        playing = False
+
     if not obstacles:
-        font = pygame.font.Font(None, 100)
-        text = font.render("YOU WON!", True, (255, 255, 255))
-        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(text, text_rect)
-        pygame.display.flip()
-        pygame.time.delay(4000)
+        end_game(message="YOU WON!")
         playing = False
 
     pygame.display.flip()
