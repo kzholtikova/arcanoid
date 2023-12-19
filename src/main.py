@@ -4,7 +4,7 @@ WIDTH, HEIGHT = 800, 600
 FPS = 60
 WHITE = (255, 255, 255)
 
-TITLE = "Arkanoid"
+TITLE = "Arkanoidik"
 
 
 class Paddle(pygame.sprite.Sprite):
@@ -61,6 +61,15 @@ class Obstacle(pygame.sprite.Sprite):
         self.image = pygame.image.load("obstacle.png")
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect(center=(x, y))
+
+
+def end_game(message):
+    font = pygame.font.Font(None, 100)
+    text = font.render(message, True, (255, 255, 255))
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(text, text_rect)
+    pygame.display.flip()
+    pygame.time.delay(4000)
 
 
 pygame.init()
@@ -121,13 +130,12 @@ while playing:
     screen.blit(paddle.image, paddle.rect)
     screen.blit(ball.image, ball.rect)
 
+    if lives == 0:
+        end_game(message="GAME OVER!")
+        playing = False
+
     if not obstacles:
-        font = pygame.font.Font(None, 100)
-        text = font.render("YOU WON!", True, (255, 255, 255))
-        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(text, text_rect)
-        pygame.display.flip()
-        pygame.time.delay(4000)
+        end_game(message="YOU WON!")
         playing = False
 
     pygame.display.flip()
