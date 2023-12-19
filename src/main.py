@@ -69,8 +69,12 @@ clock = pygame.time.Clock()
 paddle = Paddle()
 ball = Ball()
 hearts = pygame.sprite.Group()
+lives = 3
 obstacles = pygame.sprite.Group()
 playing = True
+
+for col in range(lives):
+    Heart.draw(col)
 
 obstacle_width = 60
 obstacle_height = 60
@@ -84,7 +88,7 @@ vertical_spacing = 60
 for row in range(2):
     for col in range(obstacles_row):
         x = (col + 1) * horizontal_spacing
-        y = (row + 1) * vertical_spacing
+        y = (row + 2) * vertical_spacing
         obstacle = Obstacle(x, y, obstacle_width, obstacle_height)
         obstacles.add(obstacle)
 
@@ -99,6 +103,9 @@ while playing:
     hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
 
     screen.blit(background, (0, 0))
+
+    for heart in hearts:
+        screen.blit(heart.image, heart.rect)
 
     for obstacle in obstacles:
         screen.blit(obstacle.image, obstacle.rect)
