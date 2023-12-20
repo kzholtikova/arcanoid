@@ -20,6 +20,7 @@ class Paddle(pygame.sprite.Sprite):
         self.image = pygame.image.load("platform.png")
         self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 5))
 
+
     def update(self):
         self.rect.centerx = pygame.mouse.get_pos()[0]
         self.rect.clamp_ip(screen.get_rect())
@@ -102,7 +103,6 @@ lives = 3
 hearts = pygame.sprite.Group()
 for col in range(lives):
     Heart.draw(col)
-
 obstacles = pygame.sprite.Group()
 for row in range(OBSTACLES_ROW_NUMBER):
     obstacles_per_row = OBSTACLES_IN_FIRST_ROW - row
