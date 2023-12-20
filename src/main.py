@@ -30,7 +30,7 @@ class Ball(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("ball.png")
-        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT // 2 -50))
         self.speed = pygame.Vector2(5, 5)
 
     def update(self):
@@ -94,6 +94,7 @@ pygame.init()
 pygame.display.set_caption(TITLE)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 background = pygame.image.load("background.jpg")
+background = pygame.transform.scale(background, (800, 600))
 clock = pygame.time.Clock()
 
 paddle = Paddle()
