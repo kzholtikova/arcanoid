@@ -104,6 +104,8 @@ for row in range(2):
         obstacle = Obstacle(x, y, obstacle_width, obstacle_height)
         obstacles.add(obstacle)
 
+lost_life = False
+
 while playing:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -115,6 +117,7 @@ while playing:
     if ball.rect.bottom > HEIGHT:
         list(hearts)[lives - 1].set_broken_heart()
         lives -= 1
+        lost_life = True
         ball.reset_position() if lives > 0 else None
 
     hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
@@ -139,5 +142,9 @@ while playing:
         playing = False
 
     pygame.display.flip()
+
+    if lost_life:
+        pygame.time.delay(1000)
+        lost_life = False
 
     clock.tick(FPS)
