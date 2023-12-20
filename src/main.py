@@ -3,10 +3,11 @@ import pygame
 WIDTH, HEIGHT = 800, 600
 FPS = 60
 WHITE = (255, 255, 255)
-TITLE = "Arkanoidik"
+TITLE = "Arcanoid"
+
 OBSTACLES_ROW_NUMBER = 2
 OBSTACLES_IN_FIRST_ROW = 14
-SPACES_FROM_TOP = 1.5
+SPACES_FROM_TOP = 1
 VERTICAL_OBSTACLES_SPACING = 60
 HORIZONTAL_OBSTACLES_SPACING = WIDTH / OBSTACLES_IN_FIRST_ROW
 calculate_margin = lambda obstacles_num: ((OBSTACLES_IN_FIRST_ROW - obstacles_num)
@@ -27,7 +28,6 @@ class Paddle(pygame.sprite.Sprite):
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.radius = 10
         self.image = pygame.image.load("ball.png")
         self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         self.speed = pygame.Vector2(5, 5)
@@ -97,18 +97,18 @@ clock = pygame.time.Clock()
 
 paddle = Paddle()
 ball = Ball()
-hearts = pygame.sprite.Group()
-lives = 3
-obstacles = pygame.sprite.Group()
-playing = True
 
+lives = 3
+hearts = pygame.sprite.Group()
 for col in range(lives):
     Heart.draw(col)
-
+    
+obstacles = pygame.sprite.Group()
 for row in range(OBSTACLES_ROW_NUMBER):
     obstacles_per_row = OBSTACLES_IN_FIRST_ROW - row
     Obstacle.draw_row(obstacles_per_row, row, calculate_margin(obstacles_per_row))
-
+    
+playing = True
 lost_life = False
 
 while playing:
@@ -132,15 +132,14 @@ while playing:
             break
 
     screen.blit(background, (0, 0))
+    screen.blit(paddle.image, paddle.rect)
+    screen.blit(ball.image, ball.rect)
 
     for heart in hearts:
         screen.blit(heart.image, heart.rect)
 
     for obstacle in obstacles:
         screen.blit(obstacle.image, obstacle.rect)
-
-    screen.blit(paddle.image, paddle.rect)
-    screen.blit(ball.image, ball.rect)
 
     if lives == 0:
         end_game(message="GAME OVER!")
