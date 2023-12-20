@@ -37,10 +37,17 @@ class Ball(pygame.sprite.Sprite):
         self.rect.move_ip(self.speed)
         if self.rect.left < 0 or self.rect.right > WIDTH:
             self.speed.x *= -1
-        if self.rect.top < 0:
+        if self.rect.top < 0 or self.rect.bottom > HEIGHT:
             self.speed.y *= -1
         if self.rect.colliderect(paddle):
-            self.speed.y *= -1
+            if abs(self.rect.bottom - paddle.rect.top) < abs(self.speed.y):
+                self.speed.y *= -1
+            elif abs(self.rect.top - paddle.rect.bottom) < abs(self.speed.y):
+                self.speed.y *= -1
+            elif abs(self.rect.right - paddle.rect.left) < abs(self.speed.x):
+                self.speed.x *= -1
+            elif abs(self.rect.left - paddle.rect.right) < abs(self.speed.x):
+                self.speed.x *= -1
 
     def handle_collision(self):
         normal_vector = pygame.Vector2(0, self.rect.centery - obstacle.rect.centery)
