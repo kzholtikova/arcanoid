@@ -3,8 +3,14 @@ import pygame
 WIDTH, HEIGHT = 800, 600
 FPS = 60
 WHITE = (255, 255, 255)
-
 TITLE = "Arkanoidik"
+OBSTACLES_ROW_NUMBER = 2
+OBSTACLES_IN_FIRST_ROW = 14
+SPACES_FROM_TOP = 1.5
+VERTICAL_OBSTACLES_SPACING = 60
+HORIZONTAL_OBSTACLES_SPACING = WIDTH / OBSTACLES_IN_FIRST_ROW
+calculate_margin = lambda obstacles_num: ((OBSTACLES_IN_FIRST_ROW - obstacles_num)
+                                          / 2) if obstacles_num != OBSTACLES_IN_FIRST_ROW else 0
 
 
 class Paddle(pygame.sprite.Sprite):
@@ -35,6 +41,11 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.colliderect(paddle):
             self.speed.y *= -1
 
+    def handle_collision(self):
+        normal_vector = pygame.Vector2(0, self.rect.centery - obstacle.rect.centery)
+        reflected_vector = pygame.Vector2.reflect(self.speed.normalize(), normal_vector.normalize())
+        self.speed = reflected_vector * abs(ball.speed.length())
+
     def reset_position(self):
         self.rect.center = (WIDTH // 2, HEIGHT // 2)
 
@@ -56,11 +67,17 @@ class Heart(pygame.sprite.Sprite):
 
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("obstacle.png")
-        self.image = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.image.get_rect(center=(x, y))
+        self.image = pygame.transform.scale(pygame.image.load("obstacle.png"), (60, 60))
+        self.rect = pygame.Rect(x, y, 35, 35)
+
+    @staticmethod
+    def draw_row(obstacles_num, row, margin):
+        for col in range(obstacles_num):
+            x = (col + margin) * HORIZONTAL_OBSTACLES_SPACING
+            y = (row + SPACES_FROM_TOP) * VERTICAL_OBSTACLES_SPACING
+            obstacles.add(Obstacle(x, y))
 
 
 def end_game(message):
@@ -88,21 +105,9 @@ playing = True
 for col in range(lives):
     Heart.draw(col)
 
-obstacle_width = 60
-obstacle_height = 60
-
-obstacles_row = 10
-obstacles_amount = obstacles_row * 2
-
-horizontal_spacing = WIDTH // (obstacles_row + 1)
-vertical_spacing = 60
-
-for row in range(2):
-    for col in range(obstacles_row):
-        x = (col + 1) * horizontal_spacing
-        y = (row + 2) * vertical_spacing
-        obstacle = Obstacle(x, y, obstacle_width, obstacle_height)
-        obstacles.add(obstacle)
+for row in range(OBSTACLES_ROW_NUMBER):
+    obstacles_per_row = OBSTACLES_IN_FIRST_ROW - row
+    Obstacle.draw_row(obstacles_per_row, row, calculate_margin(obstacles_per_row))
 
 lost_life = False
 
@@ -120,7 +125,11 @@ while playing:
         lost_life = True
         ball.reset_position() if lives > 0 else None
 
-    hit_obstacles = pygame.sprite.spritecollide(ball, obstacles, True)
+    for obstacle in obstacles:
+        if ball.rect.colliderect(obstacle):
+            ball.handle_collision()
+            obstacles.remove(obstacle)
+            break
 
     screen.blit(background, (0, 0))
 
