@@ -18,7 +18,8 @@ class Paddle(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("platform.png")
-        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 30))
+        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 5))
+
 
     def update(self):
         self.rect.centerx = pygame.mouse.get_pos()[0]
@@ -102,12 +103,11 @@ lives = 3
 hearts = pygame.sprite.Group()
 for col in range(lives):
     Heart.draw(col)
-    
 obstacles = pygame.sprite.Group()
 for row in range(OBSTACLES_ROW_NUMBER):
     obstacles_per_row = OBSTACLES_IN_FIRST_ROW - row
     Obstacle.draw_row(obstacles_per_row, row, calculate_margin(obstacles_per_row))
-    
+
 playing = True
 lost_life = False
 
@@ -115,7 +115,6 @@ while playing:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             playing = False
-
     paddle.update()
     ball.update()
 
