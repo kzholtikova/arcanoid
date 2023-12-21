@@ -1,5 +1,4 @@
 import pygame
-import autoplay
 
 WIDTH, HEIGHT = 800, 600
 FPS = 60
@@ -22,8 +21,8 @@ class Paddle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 5))
 
 
-    def update(self):
-        self.rect.centerx = pygame.mouse.get_pos()[0]
+    def update(self, autoplay=False):
+        self.rect.centerx = pygame.mouse.get_pos()[0] if not autoplay else ball.rect.centerx
         self.rect.clamp_ip(screen.get_rect())
 
 
