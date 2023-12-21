@@ -136,6 +136,12 @@ while playing:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             playing = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            if start_button_rect.collidepoint(mouse_pos):
+                print("Start button clicked")
+            elif autoplay_button_rect.collidepoint(mouse_pos):
+                print("Autoplay button clicked")
     paddle.update()
     ball.update()
 
