@@ -96,6 +96,17 @@ def end_game(message):
     pygame.display.flip()
     pygame.time.delay(4000)
 
+def countdown(start):
+    font = pygame.font.Font(None,200)
+    for i in range(start, 0, -1):
+        screen.fill((0, 0, 0))
+        text = font.render(str(i), True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        pygame.time.delay(1000)
+
+
 
 pygame.init()
 pygame.display.set_caption(TITLE)
@@ -115,6 +126,8 @@ obstacles = pygame.sprite.Group()
 for row in range(OBSTACLES_ROW_NUMBER):
     obstacles_per_row = OBSTACLES_IN_FIRST_ROW - row
     Obstacle.draw_row(obstacles_per_row, row, calculate_margin(obstacles_per_row))
+
+countdown(10)
 
 playing = True
 lost_life = False
