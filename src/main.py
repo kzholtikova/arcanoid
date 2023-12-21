@@ -3,7 +3,7 @@ import pygame
 WIDTH, HEIGHT = 800, 600
 FPS = 60
 WHITE = (255, 255, 255)
-TITLE = "Arcanoid"
+TITLE = "Arkanoid"
 
 OBSTACLES_ROW_NUMBER = 2
 OBSTACLES_IN_FIRST_ROW = 14
@@ -15,14 +15,14 @@ calculate_margin = lambda obstacles_num: ((OBSTACLES_IN_FIRST_ROW - obstacles_nu
 
 
 class Paddle(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, autoplay=False):
         super().__init__()
         self.image = pygame.image.load("platform.png")
         self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 5))
+        self.autoplay = autoplay
 
-
-    def update(self, autoplay=False):
-        self.rect.centerx = pygame.mouse.get_pos()[0] if not autoplay else ball.rect.centerx
+    def update(self):
+        self.rect.centerx = pygame.mouse.get_pos()[0] if not self.autoplay else ball.rect.centerx
         self.rect.clamp_ip(screen.get_rect())
 
 
@@ -107,6 +107,34 @@ def countdown(start):
         pygame.time.delay(1000)
 
 
+def define_mode(play_rect, autoplay_rect):
+    is_mouse_clicked = False
+    while not is_mouse_clicked:
+        for event in pygame.event.get():
+            if event.type != pygame.MOUSEBUTTONDOWN:
+                continue
+
+            mouse_pos = pygame.mouse.get_pos()
+            if play_rect.collidepoint(mouse_pos):
+                return False
+            elif autoplay_rect.collidepoint(mouse_pos):
+                return True
+
+
+def draw_text(text, font, color, x, y):
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=(x, y))
+    screen.blit(text_surface, text_rect)
+    return text_rect
+
+
+def display_menu():
+    font = pygame.font.Font(None, 100)
+    play_rect = draw_text("1. Play", font, (255, 255, 255), WIDTH // 2, 250)
+    autoplay_rect = draw_text("2. Autoplay", font, (255, 255, 255), WIDTH // 2, 400)
+    pygame.display.flip()
+    return play_rect, autoplay_rect
+
 
 pygame.init()
 pygame.display.set_caption(TITLE)
@@ -115,7 +143,10 @@ background = pygame.image.load("background.jpg")
 background = pygame.transform.scale(background, (800, 600))
 clock = pygame.time.Clock()
 
-paddle = Paddle()
+play_rect, autoplay_rect = display_menu()
+autoplay = define_mode(play_rect, autoplay_rect)
+
+paddle = Paddle(autoplay)
 ball = Ball()
 
 lives = 3
@@ -136,12 +167,7 @@ while playing:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             playing = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos()
-            if start_button_rect.collidepoint(mouse_pos):
-                print("Start button clicked")
-            elif autoplay_button_rect.collidepoint(mouse_pos):
-                print("Autoplay button clicked")
+
     paddle.update()
     ball.update()
 
